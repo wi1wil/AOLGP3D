@@ -25,6 +25,8 @@ public class ThirdPersonMovement : MonoBehaviour
 
         if (playerAnimator == null)
             playerAnimator = GetComponent<Animator>();
+
+        rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
     }
 
     void Update()
@@ -107,6 +109,12 @@ public class ThirdPersonMovement : MonoBehaviour
             Vector3 moveDir = Quaternion.Euler(0f, targetAngle, 0f) * Vector3.forward;
             Vector3 velocity = moveDir.normalized * moveSpeed;
             velocity.y = rb.velocity.y;
+
+            if (!isGrounded && rb.velocity.y > 0)
+            {
+                velocity.y = Mathf.Min(velocity.y, 0);
+            }
+
             rb.velocity = velocity;
         }
         else if (isGrounded)
@@ -117,6 +125,7 @@ public class ThirdPersonMovement : MonoBehaviour
 
     void Jump()
     {
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
         rb.velocity = new Vector3(rb.velocity.x, jumpForce, rb.velocity.z);
         isGrounded = false;
     }
@@ -128,6 +137,9 @@ public class ThirdPersonMovement : MonoBehaviour
             isGrounded = true;
             if (playerAnimator != null)
                 playerAnimator.SetBool("isJumping", false);
+
+            // Freeze Y again when grounded
+            rb.constraints = RigidbodyConstraints.FreezeRotation | RigidbodyConstraints.FreezePositionY;
         }
     }
 
@@ -136,6 +148,9 @@ public class ThirdPersonMovement : MonoBehaviour
         isGrounded = false;
         if (playerAnimator != null)
             playerAnimator.SetBool("isJumping", true);
+
+        // Unfreeze Y when not grounded (falling)
+        rb.constraints = RigidbodyConstraints.FreezeRotation;
     }
 
     public void TakeDamage()

@@ -9,20 +9,30 @@ public class PlayerScript : MonoBehaviour
 {
     public int hp = 100;
     public GameObject gameOverPanel;
+    public GameObject gameplayPanel;
+    public GameObject startPanel;
     public Button restartButton;
+    public Button startButton;
+    public Button quitButton;
     public TMP_Text highScoreText;
+    public TMP_Text hpText;
 
     private int highScore = 0;
 
     void Start()
     {
+        hpText.SetText("HP: " + hp);
         if (gameOverPanel != null)
         {
             gameOverPanel.SetActive(false);
         }
-        Time.timeScale = 1f;
+        if (gameplayPanel != null)
+            gameplayPanel.SetActive(false);
+        if (startPanel != null)
+            startPanel.SetActive(true);
 
-        // Load high score from PlayerPrefs
+        Time.timeScale = 0f;
+
         highScore = PlayerPrefs.GetInt("HighScore", 0);
         UpdateHighScoreUI();
     }
@@ -30,6 +40,7 @@ public class PlayerScript : MonoBehaviour
     public void TakeDamage(int damage)
     {
         hp -= damage;
+        hpText.SetText("HP: " + hp);
         if (hp <= 0)
         {
             Debug.Log("Player has died.");
@@ -59,6 +70,23 @@ public class PlayerScript : MonoBehaviour
     {
         Time.timeScale = 1f; 
         SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
+    }
+
+    public void StartGame()
+    {
+        if (startPanel != null)
+            startPanel.SetActive(false);
+        if (gameplayPanel != null)
+            gameplayPanel.SetActive(true);
+
+
+        Time.timeScale = 1f;
+    }
+
+    public void QuitGame()
+    {
+            Debug.Log("Quit Game pressed.");
+            Application.Quit();
     }
 
     private void UpdateHighScoreUI()
